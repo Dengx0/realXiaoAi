@@ -61,7 +61,7 @@ DEFAULT_STORY_RULES: dict[str, Any] = {
         "毛毛",
         "超级飞侠乐迪",
     ],
-    "locations": ["一环路", "楼下公园"],
+    "locations": ["xx路", "xx公园"],
     "education_points": [
         "简单英语单词（如 apple、hello、red、one two three），用“糕糕学会了一个新单词”等方式带出",
         "基础数学概念（数数、比大小、简单形状）",

@@ -1,0 +1,12 @@
+[
+  {
+    "deviceID": "123456789",
+    "miotDID": "987654321",
+    "name": "Xiaomi 智能音箱 Pro",
+    "alias": "客厅音箱",
+    "hardware": "LX06",
+    "serialNumber": "SAMPLE123",
+    "deviceSNProfile": "sample-profile",
+    "mac": "AA:BB:CC:DD:EE:FF"
+  }
+]

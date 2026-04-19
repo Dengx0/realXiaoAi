@@ -1,0 +1,47 @@
+{
+  "xiaoai": {
+    "user_id": "123456789",
+    "pass_token": "your-pass-token",
+    "did": "Xiaomi 智能音箱 Pro",
+    "device_id": null,
+    "timeout": 5.0,
+    "account_cache": ".mi_account.json"
+  },
+  "llm": {
+    "api_key": "your-api-key",
+    "base_url": "https://api.openai.com/v1",
+    "model": "gpt-4o-mini",
+    "temperature": 0.7,
+    "timeout": 60.0,
+    "enabled": true,
+    "story_rules": {
+      "default_protagonist": "焦糕糕",
+      "friends": ["黄一一", "夏至", "真真", "柚子妹妹", "豆芽姐姐"],
+      "locations": ["成都市一环路", "三洞桥公园", "财富家家", "皮皮家家", "新都"],
+      "education_points": [
+        "简单英语单词，如 apple、hello、red、one two three",
+        "基础数学概念，如数数、比大小、简单形状",
+        "生活常识，如过马路看红绿灯、饭前洗手、分享玩具"
+      ],
+      "min_length": 300,
+      "structure_requirements": [
+        "情节要有起承转合",
+        "设置小悬念或转折，避免平铺直叙",
+        "结尾温暖正面，可以有一个小道理但不说教"
+      ]
+    }
+  },
+  "http_api": {
+    "host": "0.0.0.0",
+    "port": 8090,
+    "public_base_url": "http://your-server-ip:8090",
+    "audio_dir": "generated_audio",
+    "max_duration_seconds": 30.0,
+    "control_token": "your-secret-token-here"
+  },
+  "elevenlabs": {
+    "api_key": "your-elevenlabs-api-key",
+    "prompt_influence": 0.3,
+    "timeout": 30.0
+  }
+}

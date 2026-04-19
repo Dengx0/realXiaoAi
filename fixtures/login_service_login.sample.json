@@ -1,0 +1,8 @@
+{
+  "code": 0,
+  "location": "https://account.xiaomi.com/pass/mock_location",
+  "nonce": "sample-nonce",
+  "ssecurity": "sample-ssecurity",
+  "passToken": "sample-pass-token",
+  "userId": "123456"
+}

@@ -129,13 +129,6 @@ python main.py --config config.json
 
 启动后，服务会完成登录与设备初始化、后台监听消息，并在启用智能能力时自动生成更适合低龄宝宝的回应、故事或声音。
 
-## 补充说明
-
-服务启动后，会同时提供状态查询、手动控制和音频访问能力。若你还想了解系统结构与模块关系，可以继续查看：
-
-- [ARCHITECTURE.md](./ARCHITECTURE.md)
-- [CLAUDE.md](./CLAUDE.md)
-
 ## License
 
 MIT License

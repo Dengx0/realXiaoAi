@@ -1,177 +1,137 @@
-# xiaoi
+# realXiaoAi
 
-小爱音箱内部 LLM 决策与控制服务。
+让小爱音箱更智能，也更适合低龄宝宝长期陪伴。
 
-## Current Scope
+这个项目把小爱音箱接入一套可配置的智能决策服务：它可以围绕宝宝熟悉的人、地点和日常生成更有代入感的故事，也可以围绕绘本、角色或场景生成对应的声音与氛围音，让“听故事”从单纯播报变成更有画面感的陪伴体验。
 
-- Xiaomi 登录与设备绑定
-- 小爱消息轮询
-- 基于 OpenAI 兼容接口的内部 LLM Function Calling 决策
-- 小爱设备控制（TTS、音频播放、音量、MiOT 命令）
-- 统一 HTTP API 服务
-- ElevenLabs 音效生成与静态音频访问
-- 最近消息与最近一次 LLM 动作状态查询
+相比直接把知识当作课程灌输，这个项目更强调先建立兴趣，再把简单英语、基础数学、生活常识等内容自然融入故事和互动里。加上小爱音箱本身没有显示屏，更适合低龄宝宝进行无屏幕交互，减少对视力的影响。
 
-## Quick Start
+## 这个项目能做什么
 
-安装依赖：
+- 根据宝宝熟悉的人物、地点和日常场景，生成更贴近日常的故事
+- 围绕绘本、角色或情境生成声音与音效，增强沉浸感
+- 在故事和陪伴过程中，自然融入简单英语、数数和生活常识
+- 持续监听小爱消息，并自动决定是正常回应、播报内容，还是生成并播放音效
+- 提供基础状态查看、手动控制和音频访问能力
+
+## 业务流程
+
+1. 宝宝或家长先对小爱音箱说一句话。
+2. 服务会持续监听并获取新的小爱消息。
+3. 系统根据当前配置，判断这次更适合直接放行、播报文本，还是生成一个更贴近场景的故事或声音。
+4. 如果启用了智能能力，系统会结合故事规则、熟悉角色和教育目标，生成更适合低龄宝宝的回应内容。
+5. 如果启用了音效生成，还可以围绕绘本或场景生成环境音、情节音，再通过音箱播放出来。
+6. 家长也可以通过 HTTP 接口查看状态、查看最近消息，或手动触发播报、播放和音频生成。
+
+## 启动前准备
+
+先安装依赖：
 
 ```bash
 uv pip install requests openai
 ```
 
-复制配置文件：
+再复制配置文件：
 
 ```bash
 copy config.example.json config.json
 ```
 
-编辑 `config.json`：
+编辑 `config.json` 时，建议按下面四组配置项准备。
 
-- `xiaoai.user_id`
-- `xiaoai.pass_token`
-- `xiaoai.did`
-- `llm.api_key`
-- `llm.base_url`
-- `llm.model`
-- `http_api.host`
-- `http_api.port`
-- `http_api.public_base_url`
-- `http_api.audio_dir`
-- `http_api.control_token`（可选，建议配置）
-- `elevenlabs.api_key`（可选；仅在启用音效生成时需要）
+### 1. 基础必填
 
-统一入口：
+这些配置决定服务能否完成登录、绑定设备并正常启动。
+
+- `xiaoai.user_id`：小米账号对应的用户标识
+- `xiaoai.pass_token`：登录所需凭证
+- `xiaoai.did`：要绑定和控制的目标小爱设备
+- `http_api.host`：服务监听地址
+- `http_api.port`：服务监听端口
+- `http_api.public_base_url`：生成音频对外访问时使用的基础地址
+- `http_api.audio_dir`：生成音频的保存目录
+
+### 2. 启用 LLM 时必填
+
+如果你希望小爱能自动生成更聪明的回应、故事或动作决策，还需要配置：
+
+- `llm.enabled`：是否开启智能决策
+- `llm.api_key`：模型服务密钥
+- `llm.base_url`：兼容 OpenAI 接口的服务地址
+- `llm.model`：使用的模型名称
+
+如果不配置 `llm`，或者把 `llm.enabled` 设为 `false`，服务仍然可以启动，但不会自动执行智能故事、智能回应和音效决策。
+
+### 3. 建议配置
+
+这些不是绝对必填，但很建议在正式使用前补齐：
+
+- `http_api.control_token`：保护控制接口，避免被随意调用
+- `llm.story_rules`：定义故事里的熟悉人物、地点、知识点、篇幅和结构
+- `llm.temperature`：控制生成内容的灵活度
+- `llm.timeout`：控制模型请求超时
+
+其中 `llm.story_rules` 很关键，它直接决定故事是不是更贴近孩子自己的生活，也决定知识点如何被自然融入进去。
+
+### 4. 音效生成可选
+
+如果你希望围绕绘本、角色或场景生成环境音和情节音，还需要配置：
+
+- `elevenlabs.api_key`：音效生成服务密钥
+- `elevenlabs.prompt_influence`：控制文本提示对生成音效的影响程度
+- `elevenlabs.timeout`：控制音效生成超时
+
+如果暂时不需要音效生成，这组可以先不配置。
+
+## 建议先运行检查脚本
+
+正式启动前，建议先把下面几个脚本跑通，再启动主服务。这样能更快确认配置是否生效，也更容易排查问题。
+
+### 1. 检查小米账号登录是否成功
+
+```bash
+python scripts/check_login.py config.json
+```
+
+用途：确认 `xiaoai.user_id`、`xiaoai.pass_token` 是否可用，并验证目标设备能否被正确找到。
+
+### 2. 查看账号下的设备列表
+
+```bash
+python scripts/list_devices.py config.json
+```
+
+用途：确认当前账号下有哪些设备，并检查 `xiaoai.did` 是否填写正确。
+
+### 3. 检查是否能正常拉取小爱消息
+
+```bash
+python scripts/poll_messages.py config.json
+```
+
+用途：确认消息链路正常，服务确实能监听到新的小爱消息。
+
+### 4. 检查 LLM 配置是否生效
+
+```bash
+python scripts/check_llm.py config.json "给宝宝讲一个贴近日常的睡前故事"
+```
+
+用途：仅在启用 LLM 时需要，用来确认 `llm` 配置是否有效，以及模型是否能返回可用的动作结果。
+
+## 启动命令
+
+当上面的检查都通过后，再正式启动服务：
 
 ```bash
 python main.py --config config.json
 ```
 
-启动后会默认完成这些事情：
+启动后，服务会完成登录与设备初始化、后台监听消息，并在启用智能能力时自动生成更适合低龄宝宝的回应、故事或声音。
 
-- 登录并初始化目标音箱
-- 后台轮询最近消息
-- 将新消息送入内部 LLM 决策链
-- 按 LLM 返回的动作执行 TTS、音频播放或音效生成
-- 提供 HTTP 控制接口和音频生成接口
+## 补充说明
 
-## 业务流程
-
-1. 用户唤起小爱音箱并说话。
-2. 程序轮询到新的小爱消息后，写入最近消息缓存。
-3. 若 `llm.enabled=true`，消息会进入 `LLMClient` 的 Function Calling 决策流程。
-4. LLM 返回 `pass_through`、`speak_text` 或 `generate_sound_effect` 动作。
-5. `XiaoAiService` 按动作执行原生放行、TTS 播报或 ElevenLabs 音效生成并播放。
-6. HTTP API 同时提供状态查询、消息查看、手动控制和音频生成能力。
-
-## HTTP API
-
-服务监听在 `http_api.host:port`。
-
-### 状态接口
-
-```bash
-GET /
-```
-
-返回服务状态、目标设备信息、`llm` 摘要和接口列表。
-
-### 最近消息
-
-```bash
-GET /api/xiaoai/messages?limit=20
-```
-
-返回最近轮询到的消息列表。
-
-### 控制接口
-
-```bash
-POST /api/xiaoai/tts
-{"text":"今天天气晴朗","interrupt":true,"save":0}
-```
-
-```bash
-POST /api/xiaoai/audio
-{"url":"https://example.com/audio.mp3","interrupt":true}
-```
-
-```bash
-POST /api/xiaoai/volume
-{"volume":50}
-```
-
-```bash
-POST /api/xiaoai/command
-{"siid":3,"aiid":1,"params":[]}
-```
-
-```bash
-POST /api/xiaoai/stop
-{}
-```
-
-### 统一控制接口
-
-```bash
-POST /api/xiaoai/control
-{"action":"tts","text":"今天天气晴朗","interrupt":true}
-```
-
-支持 `tts`、`audio`、`volume`、`command`、`stop`、`audio_generate`。
-
-### 音频生成接口
-
-```bash
-POST /api/audio/generate
-{"text":"生成一段下雨的环境音","duration_seconds":5.0}
-```
-
-返回：
-
-```json
-{
-  "audio_url": "http://your-server:8090/audio/sound_xxx.mp3",
-  "filename": "sound_xxx.mp3",
-  "duration_seconds": 5.0
-}
-```
-
-## LLM 配置说明
-
-`llm` section 使用 OpenAI 兼容接口，支持：
-
-- `api_key`：API Key
-- `base_url`：兼容 OpenAI Chat Completions 的服务地址
-- `model`：模型名
-- `system_prompt`：可选，自定义系统提示词
-- `story_rules`：可选，讲故事规则
-- `temperature`：采样温度
-- `timeout`：请求超时
-- `enabled`：是否启用 LLM 决策
-
-当 `llm.enabled=false` 或未配置 `llm` 时，服务仍可启动，但不会自动对消息执行 LLM 动作。
-
-## 鉴权
-
-如果配置了 `http_api.control_token`，可使用：
-
-```bash
-Authorization: Bearer your-secret-token
-X-XiaoAI-Token: your-secret-token
-```
-
-## CORS
-
-所有接口默认允许跨域：
-
-```bash
-Access-Control-Allow-Origin: *
-Access-Control-Allow-Methods: GET, POST, OPTIONS
-Access-Control-Allow-Headers: Content-Type, Authorization, X-XiaoAI-Token
-```
-
-## 文档
+服务启动后，会同时提供状态查询、手动控制和音频访问能力。若你还想了解系统结构与模块关系，可以继续查看：
 
 - [ARCHITECTURE.md](./ARCHITECTURE.md)
 - [CLAUDE.md](./CLAUDE.md)

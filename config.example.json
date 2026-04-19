@@ -15,9 +15,9 @@
     "timeout": 60.0,
     "enabled": true,
     "story_rules": {
-      "default_protagonist": "焦糕糕",
-      "friends": ["黄一一", "夏至", "真真", "柚子妹妹", "豆芽姐姐"],
-      "locations": ["成都市一环路", "三洞桥公园", "财富家家", "皮皮家家", "新都"],
+      "default_protagonist": "糕糕",
+      "friends": ["小红", "小白", "xx哥哥", "xx妹妹", "xx姐姐"],
+      "locations": ["xx市xx路", "xxx公园", "xx家", "xx家", "xx商场"],
       "education_points": [
         "简单英语单词，如 apple、hello、red、one two three",
         "基础数学概念，如数数、比大小、简单形状",
